@@ -198,10 +198,9 @@ const Pricing = () => {
                 <p className="text-sm font-semibold tracking-wide uppercase text-muted-foreground mb-2">Add-Ons</p>
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <div
-                    className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${
+                    className={`w-5 h-5 border-2 flex items-center justify-center transition-colors shrink-0 ${
                       cybersecurity ? "bg-primary border-primary" : "border-border"
                     }`}
-                    onClick={() => setCybersecurity(!cybersecurity)}
                   >
                     {cybersecurity && <Check size={14} className="text-primary-foreground" />}
                   </div>
@@ -222,10 +221,9 @@ const Pricing = () => {
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <div
-                    className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${
+                    className={`w-5 h-5 border-2 flex items-center justify-center transition-colors shrink-0 ${
                       backup ? "bg-primary border-primary" : "border-border"
                     }`}
-                    onClick={() => setBackup(!backup)}
                   >
                     {backup && <Check size={14} className="text-primary-foreground" />}
                   </div>
