@@ -17,10 +17,10 @@ const Header = () => {
   const location = useLocation();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-primary">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-black/10">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="font-display text-xl font-bold text-primary-foreground tracking-wider">
-          CONTINUATE
+        <Link to="/" className="flex items-center gap-3">
+          <img src="/Continuate_logo.png" alt="Continuate" className="h-10 w-auto" />
         </Link>
 
         {/* Desktop nav */}
@@ -31,8 +31,8 @@ const Header = () => {
               to={link.path}
               className={`text-sm font-medium tracking-wide transition-opacity hover:opacity-100 ${
                 location.pathname === link.path
-                  ? "text-primary-foreground opacity-100"
-                  : "text-primary-foreground/70 opacity-70"
+                  ? "text-black opacity-100"
+                  : "text-black/60 opacity-70"
               }`}
             >
               {link.label}
@@ -40,7 +40,7 @@ const Header = () => {
           ))}
           <Link
             to="/contact"
-            className="border border-primary-foreground/30 px-5 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground hover:text-primary"
+            className="border border-black/30 px-5 py-2 text-sm font-medium text-black transition-colors hover:bg-black hover:text-white"
           >
             Get a Quote
           </Link>
@@ -49,7 +49,7 @@ const Header = () => {
         {/* Mobile toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden text-primary-foreground"
+          className="md:hidden text-black"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -64,7 +64,7 @@ const Header = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-primary overflow-hidden border-t border-primary-foreground/10"
+            className="md:hidden bg-white overflow-hidden border-t border-black/10"
           >
             <div className="container py-6 flex flex-col gap-4">
               {navLinks.map((link) => (
@@ -74,8 +74,8 @@ const Header = () => {
                   onClick={() => setMobileOpen(false)}
                   className={`text-lg font-medium ${
                     location.pathname === link.path
-                      ? "text-primary-foreground"
-                      : "text-primary-foreground/60"
+                      ? "text-black"
+                      : "text-black/60"
                   }`}
                 >
                   {link.label}

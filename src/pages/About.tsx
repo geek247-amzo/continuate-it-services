@@ -46,7 +46,7 @@ const About = () => {
                   Over the past decade, we've grown into a full-service MSSP, offering NOC/SOC operations, networking, CCTV, biometrics, server room installations, and comprehensive backup solutions. Our team of certified technicians operates 24/7, ensuring our clients' infrastructure is always protected.
                 </p>
                 <p>
-                  Today, we serve over 500 clients across finance, retail, manufacturing, and professional services sectors — all from our headquarters in Johannesburg.
+                  Today, we manage over 1,000 devices across finance, retail, manufacturing, and professional services sectors — all from our headquarters in Johannesburg.
                 </p>
               </div>
             </motion.div>

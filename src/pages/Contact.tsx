@@ -119,7 +119,7 @@ const Contact = () => {
                   <Phone size={20} className="text-foreground mt-1 shrink-0" />
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Call Us</h4>
-                    <p className="text-muted-foreground text-sm">+27 (0) 11 000 0000</p>
+                    <p className="text-muted-foreground text-sm">+27 73 209 9100</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">

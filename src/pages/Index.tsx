@@ -15,7 +15,7 @@ const services = [
 
 const stats = [
   { value: "10+", label: "Years in Business" },
-  { value: "500+", label: "Clients Secured" },
+  { value: "1000+", label: "Devices Managed" },
   { value: "99.9%", label: "Uptime Guaranteed" },
   { value: "24/7", label: "Support Available" },
 ];
@@ -125,7 +125,7 @@ const Index = () => {
       </section>
 
       {/* CTA */}
-      <section className="section-padding bg-primary">
+      <section className="section-padding bg-black">
         <div className="container text-center">
           <motion.div
             initial="hidden"
@@ -134,15 +134,15 @@ const Index = () => {
             variants={fadeUp}
             custom={0}
           >
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-6">
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6">
               Ready to Secure Your Business?
             </h2>
-            <p className="text-primary-foreground/60 max-w-lg mx-auto mb-10 leading-relaxed">
+            <p className="text-white/60 max-w-lg mx-auto mb-10 leading-relaxed">
               Get in touch with our team for a free consultation and customised IT security proposal.
             </p>
             <Link
               to="/contact"
-              className="inline-block bg-primary-foreground text-primary px-10 py-4 text-sm font-semibold tracking-wide hover:bg-primary-foreground/90 transition-colors"
+              className="inline-block bg-white text-black px-10 py-4 text-sm font-semibold tracking-wide hover:bg-white/90 transition-colors"
             >
               Contact Us Today
             </Link>
