@@ -1,45 +1,140 @@
 import { motion } from "framer-motion";
-import { Shield, Server, Camera, Network, HardDrive, Lock, ChevronRight } from "lucide-react";
+import {
+  Shield,
+  Server,
+  Camera,
+  Network,
+  HardDrive,
+  Lock,
+  Monitor,
+  ChevronRight,
+  MessageSquare,
+  ClipboardCheck,
+  Rocket,
+  Activity,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import cctvImage from "@/assets/cctv-security.jpg";
 import { fadeUp } from "@/lib/animations";
 
 const services = [
   {
+    icon: Monitor,
+    title: "Managed IT Support",
+    desc: "Our foundational managed service provides proactive monitoring, remote support, and automation-driven maintenance across your entire IT environment. Every device, every user — covered under a single predictable monthly fee.",
+    features: [
+      "Proactive 24/7 monitoring via our NOC",
+      "Unlimited remote support for all users",
+      "Automated patch management & updates",
+      "Asset tracking & lifecycle management",
+      "Vendor liaison & procurement support",
+      "Monthly reporting & strategic reviews",
+    ],
+  },
+  {
     icon: Server,
     title: "NOC / SOC Operations",
-    desc: "Our Network and Security Operations Centres provide round-the-clock monitoring, alerting, and incident response. We use industry-leading tools to detect anomalies before they become threats.",
-    features: ["24/7 real-time monitoring", "Automated alert escalation", "Monthly performance reports", "SLA-backed response times"],
+    desc: "Our Network and Security Operations Centres provide round-the-clock monitoring, alerting, and incident response. We use industry-leading tools to detect anomalies before they become threats — backed by strict SLAs and dedicated analysts.",
+    features: [
+      "24/7 real-time network monitoring",
+      "Automated alert escalation & triage",
+      "Security incident detection & response",
+      "SLA-backed response times",
+      "Monthly performance & threat reports",
+      "Dedicated analyst oversight",
+    ],
   },
   {
     icon: Shield,
     title: "Cybersecurity",
-    desc: "Comprehensive security services including vulnerability assessments, penetration testing, firewall management, endpoint protection, and security awareness training for your staff.",
-    features: ["Vulnerability scanning", "Penetration testing", "Endpoint detection & response", "Security awareness training"],
+    desc: "Comprehensive, multi-layered security services that protect your business from evolving threats. From perimeter defence to endpoint protection — we cover every attack surface and keep you compliant with POPIA and industry standards.",
+    features: [
+      "Advanced threat detection & response",
+      "Firewall management & configuration",
+      "Endpoint detection & response (EDR)",
+      "Vulnerability assessments & pen testing",
+      "POPIA compliance consulting",
+      "Security awareness training for staff",
+    ],
   },
   {
     icon: HardDrive,
     title: "Backups & Disaster Recovery",
-    desc: "Automated, encrypted backups with tested disaster recovery plans. We ensure your data is always recoverable, whether from hardware failure, ransomware, or natural disaster.",
-    features: ["Automated daily backups", "Off-site replication", "Recovery testing", "Ransomware protection"],
+    desc: "Automated, encrypted backups with tested disaster recovery plans ensure your data is always recoverable — whether from hardware failure, ransomware, or natural disaster. We don't just back up; we verify and test recovery regularly.",
+    features: [
+      "Automated daily encrypted backups",
+      "Off-site & cloud replication",
+      "Regularly tested DR plans",
+      "Ransomware protection & isolation",
+      "Rapid restore with defined RTOs",
+      "Compliance-ready audit trails",
+    ],
   },
   {
     icon: Network,
     title: "Networking",
-    desc: "Enterprise-grade network infrastructure — from initial design through deployment and ongoing management. We handle LAN, WAN, Wi-Fi, VPN, and SD-WAN solutions.",
-    features: ["Network design & audit", "Wi-Fi & LAN deployment", "VPN & SD-WAN", "Performance optimisation"],
+    desc: "Enterprise-grade network infrastructure — from initial design through deployment and ongoing optimisation. We handle everything from structured cabling to SD-WAN, ensuring your connectivity is fast, reliable, and secure.",
+    features: [
+      "LAN/WAN design & deployment",
+      "Wi-Fi site surveys & installation",
+      "VPN & remote access solutions",
+      "SD-WAN deployment & management",
+      "Network performance optimisation",
+      "Structured cabling & audits",
+    ],
   },
   {
     icon: Camera,
     title: "CCTV & Biometrics",
-    desc: "Professional surveillance and access control systems. From site survey through installation to remote monitoring, we deliver end-to-end physical security solutions.",
-    features: ["IP camera systems", "Biometric access control", "Remote monitoring", "Maintenance & support"],
+    desc: "Professional surveillance and access control systems tailored to your facility. From site survey through installation to remote monitoring, we deliver end-to-end physical security that integrates with your IT environment.",
+    features: [
+      "IP camera system design & install",
+      "Biometric access control systems",
+      "Site surveys & risk assessments",
+      "Remote monitoring & alerts",
+      "Integration with IT infrastructure",
+      "Maintenance & support contracts",
+    ],
   },
   {
     icon: Lock,
     title: "Server Rooms & Hardware",
-    desc: "Purpose-built server room installations with proper cooling, power management, and cable infrastructure. We also handle hardware procurement and lifecycle management.",
-    features: ["Server room design & build", "Cooling & power systems", "Hardware procurement", "Lifecycle management"],
+    desc: "Purpose-built server room installations with proper cooling, power management, and cable infrastructure. We also handle hardware procurement, racking, and full lifecycle management — from spec to decommission.",
+    features: [
+      "Server room design & construction",
+      "Cooling & power management systems",
+      "Hardware procurement & racking",
+      "Structured cabling & labelling",
+      "Lifecycle management & refresh cycles",
+      "Environmental monitoring & alerts",
+    ],
+  },
+];
+
+const process = [
+  {
+    icon: MessageSquare,
+    step: "01",
+    title: "Consult",
+    desc: "We start with a discovery call to understand your business, existing infrastructure, pain points, and goals.",
+  },
+  {
+    icon: ClipboardCheck,
+    step: "02",
+    title: "Assess",
+    desc: "Our engineers perform a thorough audit of your IT environment — identifying risks, gaps, and opportunities.",
+  },
+  {
+    icon: Rocket,
+    step: "03",
+    title: "Deploy",
+    desc: "We implement solutions with minimal disruption — rolling out monitoring, security, and infrastructure upgrades.",
+  },
+  {
+    icon: Activity,
+    step: "04",
+    title: "Monitor",
+    desc: "Ongoing 24/7 monitoring, proactive maintenance, and regular strategic reviews keep your systems optimised.",
   },
 ];
 
@@ -60,7 +155,7 @@ const Services = () => {
               End-to-End IT Security & Infrastructure
             </h1>
             <p className="text-lg text-primary-foreground/60 leading-relaxed">
-              From monitoring to hardware — we cover every layer of your IT stack with managed services built for reliability.
+              From monitoring to hardware — we cover every layer of your IT stack with managed services built for reliability, security, and scale.
             </p>
           </motion.div>
         </div>
@@ -69,7 +164,7 @@ const Services = () => {
       {/* Services Detail */}
       <section className="section-padding bg-background">
         <div className="container space-y-24">
-          {services.map((service, i) => (
+          {services.map((service) => (
             <motion.div
               key={service.title}
               custom={0}
@@ -103,6 +198,44 @@ const Services = () => {
               </div>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* How We Work */}
+      <section className="section-padding bg-secondary">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            custom={0}
+            className="text-center mb-16"
+          >
+            <p className="text-sm font-medium tracking-[0.3em] uppercase text-muted-foreground mb-3">Our Process</p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground">How We Work</h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {process.map((step, i) => (
+              <motion.div
+                key={step.title}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="relative p-8 bg-background border border-border"
+              >
+                <span className="font-display text-5xl font-bold text-muted-foreground/20 absolute top-4 right-6">
+                  {step.step}
+                </span>
+                <step.icon size={28} className="text-foreground mb-4" strokeWidth={1.5} />
+                <h3 className="font-display text-xl font-bold text-foreground mb-3">{step.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
