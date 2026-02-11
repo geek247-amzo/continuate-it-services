@@ -23,10 +23,10 @@ const About = () => {
           >
             <p className="text-sm font-medium tracking-[0.3em] uppercase text-primary-foreground/50 mb-4">About Us</p>
             <h1 className="font-display text-5xl md:text-6xl font-bold text-primary-foreground leading-tight mb-6">
-              Defending Johannesburg's Businesses Since 2015
+              Built by an IT Operator. Trusted by Growing Businesses.
             </h1>
             <p className="text-lg text-primary-foreground/60 leading-relaxed">
-              Continuate IT Services is a Managed Security Service Provider (MSSP) delivering enterprise-grade IT solutions to SMEs across Gauteng.
+              Continuate IT Services is founder-led by Amrish Seunarain, with 20+ years of hands-on IT support experience across environments from TP-Link to Cisco.
             </p>
           </motion.div>
         </div>
@@ -40,13 +40,13 @@ const About = () => {
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-6">Our Story</h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Founded in 2015 in Johannesburg, Continuate IT Services began with a simple mission: make enterprise-level cybersecurity accessible to small and medium businesses.
+                  Continuate was founded by Amrish Seunarain after two decades in frontline IT support. The goal was clear: give SMEs the same disciplined IT and security standards usually reserved for large enterprises.
                 </p>
                 <p>
-                  Over the past decade, we've grown into a full-service MSSP, offering NOC/SOC operations, networking, CCTV, biometrics, server room installations, and comprehensive backup solutions. Our team of certified technicians operates 24/7, ensuring our clients' infrastructure is always protected.
+                  We combine practical field experience with managed service structure. From TP-Link rollouts to Cisco-grade network and security operations, we design, implement, and maintain systems that stay stable under real-world pressure.
                 </p>
                 <p>
-                  Today, we manage over 1,000 devices across finance, retail, manufacturing, and professional services sectors — all from our headquarters in Johannesburg.
+                  Today, we support organizations across finance, retail, manufacturing, and professional services, with NOC/SOC operations, networking, CCTV, biometrics, backup, and server room infrastructure.
                 </p>
               </div>
             </motion.div>
@@ -57,6 +57,43 @@ const About = () => {
                 alt="Continuate security operations center"
                 className="w-full aspect-square object-cover grayscale"
               />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Differentiation + Security */}
+      <section className="section-padding bg-background">
+        <div className="container">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={0}
+              className="p-8 bg-secondary border border-border"
+            >
+              <p className="text-sm font-medium tracking-[0.2em] uppercase text-muted-foreground mb-3">Why Continuate</p>
+              <h2 className="font-display text-3xl font-bold text-foreground mb-4">No handoffs. No ticket ping-pong.</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                Our key differentiator is direct technical ownership. The same team that scopes your environment is accountable for operations, incident response, and long-term improvements.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={1}
+              className="p-8 bg-secondary border border-border"
+            >
+              <p className="text-sm font-medium tracking-[0.2em] uppercase text-muted-foreground mb-3">Security & Compliance</p>
+              <h2 className="font-display text-3xl font-bold text-foreground mb-4">Security controls you can verify</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                We implement POPIA-aligned controls, layered monitoring, and documented operational processes. Where client or regulatory requirements apply, we share current certification and compliance evidence during onboarding.
+              </p>
             </motion.div>
           </div>
         </div>
