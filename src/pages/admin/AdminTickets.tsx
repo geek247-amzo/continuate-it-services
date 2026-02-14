@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,15 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search } from "lucide-react";
-
-const tickets = [
-  { id: "TKT-1042", subject: "VPN connectivity issue", client: "Alex Johnson", category: "Networking", priority: "High", status: "Open", assigned: "Thabo Nkosi", created: "7 Feb", sla: "4h" },
-  { id: "TKT-1041", subject: "Email server lag", client: "Naledi Dube", category: "General", priority: "Medium", status: "Open", assigned: "Unassigned", created: "7 Feb", sla: "8h" },
-  { id: "TKT-1039", subject: "Backup job failed — Server-03", client: "Alex Johnson", category: "Backups", priority: "Medium", status: "In Progress", assigned: "Thabo Nkosi", created: "5 Feb", sla: "—" },
-  { id: "TKT-1037", subject: "Ransomware alert — false positive", client: "Sarah Mbeki", category: "Cybersecurity", priority: "High", status: "In Progress", assigned: "Admin", created: "4 Feb", sla: "—" },
-  { id: "TKT-1035", subject: "New user onboarding request", client: "Alex Johnson", category: "General", priority: "Low", status: "Resolved", assigned: "Thabo Nkosi", created: "2 Feb", sla: "—" },
-  { id: "TKT-1030", subject: "Firewall rule update needed", client: "James van Wyk", category: "Cybersecurity", priority: "High", status: "Resolved", assigned: "Admin", created: "28 Jan", sla: "—" },
-];
+import { fetchTickets, type Ticket } from "@/lib/api";
+import { formatDate } from "@/lib/formatters";
 
 const statusColor = (s: string) => {
   if (s === "Open") return "bg-foreground text-background";
@@ -26,18 +19,46 @@ const statusColor = (s: string) => {
 
 const AdminTickets = () => {
   const [search, setSearch] = useState("");
-  const filtered = tickets.filter(
-    (t) =>
-      t.subject.toLowerCase().includes(search.toLowerCase()) ||
-      t.client.toLowerCase().includes(search.toLowerCase()) ||
-      t.id.toLowerCase().includes(search.toLowerCase())
-  );
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    fetchTickets()
+      .then((data) => {
+        if (!active) return;
+        setTickets(data);
+      })
+      .catch(() => {
+        if (!active) return;
+        setTickets([]);
+      })
+      .finally(() => {
+        if (!active) return;
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const term = search.toLowerCase();
+    return tickets.filter(
+      (t) =>
+        t.subject.toLowerCase().includes(term) ||
+        (t.customer ?? "").toLowerCase().includes(term) ||
+        t.id.toLowerCase().includes(term)
+    );
+  }, [tickets, search]);
 
   return (
     <div className="space-y-8">
       <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
         <h2 className="font-display text-2xl font-bold text-foreground mb-1">Ticket Management</h2>
-        <p className="text-sm text-muted-foreground">{tickets.filter((t) => t.status !== "Resolved").length} open · {tickets.length} total</p>
+        <p className="text-sm text-muted-foreground">
+          {tickets.filter((t) => t.status !== "Resolved").length} open · {tickets.length} total
+        </p>
       </motion.div>
 
       <Tabs defaultValue="all">
@@ -72,25 +93,42 @@ const AdminTickets = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered
-                      .filter((t) => {
-                        if (tab === "open") return t.status === "Open";
-                        if (tab === "progress") return t.status === "In Progress";
-                        if (tab === "resolved") return t.status === "Resolved";
-                        return true;
-                      })
-                      .map((t) => (
-                        <TableRow key={t.id}>
-                          <TableCell className="font-mono text-xs text-muted-foreground">{t.id}</TableCell>
-                          <TableCell className="font-medium text-foreground">{t.subject}</TableCell>
-                          <TableCell className="hidden md:table-cell text-muted-foreground">{t.client}</TableCell>
-                          <TableCell className="hidden lg:table-cell text-muted-foreground">{t.assigned}</TableCell>
-                          <TableCell className={`hidden sm:table-cell ${t.priority === "High" ? "text-foreground font-semibold" : "text-muted-foreground"}`}>{t.priority}</TableCell>
-                          <TableCell><Badge className={statusColor(t.status)}>{t.status}</Badge></TableCell>
-                          <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">{t.sla}</TableCell>
-                          <TableCell><Button variant="ghost" size="sm">Manage</Button></TableCell>
-                        </TableRow>
-                      ))}
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-6">
+                          Loading tickets…
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filtered
+                        .filter((t) => {
+                          if (tab === "open") return t.status === "Open";
+                          if (tab === "progress") return t.status === "In Progress";
+                          if (tab === "resolved") return t.status === "Resolved";
+                          return true;
+                        })
+                        .map((t) => (
+                          <TableRow key={t.id}>
+                            <TableCell className="font-mono text-xs text-muted-foreground">{t.id}</TableCell>
+                            <TableCell className="font-medium text-foreground">{t.subject}</TableCell>
+                            <TableCell className="hidden md:table-cell text-muted-foreground">{t.customer}</TableCell>
+                            <TableCell className="hidden lg:table-cell text-muted-foreground">{t.assignedTo ?? "Unassigned"}</TableCell>
+                            <TableCell className={`hidden sm:table-cell ${t.priority === "High" ? "text-foreground font-semibold" : "text-muted-foreground"}`}>{t.priority}</TableCell>
+                            <TableCell><Badge className={statusColor(t.status ?? "Open")}>{t.status}</Badge></TableCell>
+                            <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
+                              {formatDate(t.slaDueAt)}
+                            </TableCell>
+                            <TableCell><Button variant="ghost" size="sm">Manage</Button></TableCell>
+                          </TableRow>
+                        ))
+                    )}
+                    {!loading && filtered.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-6">
+                          No tickets yet.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

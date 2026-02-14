@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,14 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search } from "lucide-react";
-
-const tickets = [
-  { id: "TKT-1042", subject: "VPN connectivity issue", category: "Networking", priority: "High", status: "Open", created: "7 Feb 2026", updated: "8 Feb 2026" },
-  { id: "TKT-1039", subject: "Backup job failed on Server-03", category: "Backups", priority: "Medium", status: "In Progress", created: "5 Feb 2026", updated: "7 Feb 2026" },
-  { id: "TKT-1035", subject: "New user onboarding request", category: "General", priority: "Low", status: "Resolved", created: "2 Feb 2026", updated: "4 Feb 2026" },
-  { id: "TKT-1030", subject: "Firewall rule update needed", category: "Cybersecurity", priority: "High", status: "Resolved", created: "28 Jan 2026", updated: "30 Jan 2026" },
-  { id: "TKT-1025", subject: "CCTV camera offline — Building B", category: "CCTV", priority: "Medium", status: "Resolved", created: "22 Jan 2026", updated: "23 Jan 2026" },
-];
+import { createTicket, fetchPortalSummary, type Profile, type Ticket } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { formatDate } from "@/lib/formatters";
 
 const statusColor = (s: string) => {
   if (s === "Open") return "bg-foreground text-background";
@@ -31,14 +27,78 @@ const priorityStyle = (p: string) => {
 };
 
 const PortalHelpdesk = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [showNew, setShowNew] = useState(false);
   const [search, setSearch] = useState("");
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({
+    subject: "",
+    category: "General",
+    priority: "Medium",
+    description: "",
+  });
 
-  const filtered = tickets.filter(
-    (t) =>
-      t.subject.toLowerCase().includes(search.toLowerCase()) ||
-      t.id.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    if (!user?.email) return;
+    let active = true;
+    const load = async () => {
+      try {
+        const summary = await fetchPortalSummary(user.email);
+        if (!active) return;
+        setProfile(summary.profile);
+        setTickets(summary.tickets ?? []);
+      } catch (error) {
+        if (!active) return;
+        setProfile(null);
+        setTickets([]);
+      } finally {
+        if (!active) return;
+        setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      active = false;
+    };
+  }, [user?.email]);
+
+  const filtered = useMemo(() => {
+    const term = search.toLowerCase();
+    return tickets.filter(
+      (t) =>
+        t.subject.toLowerCase().includes(term) ||
+        t.id.toLowerCase().includes(term)
+    );
+  }, [tickets, search]);
+
+  const handleSubmit = async () => {
+    if (!user?.email) return;
+    const customer = profile?.company ?? profile?.name ?? user.email;
+    try {
+    const created = await createTicket({
+      customer,
+      requesterName: profile?.name ?? user.email,
+      requesterEmail: user.email,
+      subject: form.subject,
+      category: form.category,
+      priority: form.priority,
+      description: form.description,
+    });
+      setTickets((prev) => [created, ...prev]);
+      setShowNew(false);
+      setForm({ subject: "", category: "General", priority: "Medium", description: "" });
+      toast({ title: "Ticket submitted", description: `${created.id} created.` });
+    } catch (error) {
+      toast({
+        title: "Ticket failed",
+        description: error instanceof Error ? error.message : "Unable to create ticket.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -62,11 +122,19 @@ const PortalHelpdesk = () => {
               <form className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Subject</Label>
-                  <Input placeholder="Brief description of the issue" />
+                  <Input
+                    placeholder="Brief description of the issue"
+                    value={form.subject}
+                    onChange={(e) => setForm((prev) => ({ ...prev, subject: e.target.value }))}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Category</Label>
-                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={form.category}
+                    onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+                  >
                     <option>Networking</option>
                     <option>Cybersecurity</option>
                     <option>Backups</option>
@@ -77,7 +145,11 @@ const PortalHelpdesk = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Priority</Label>
-                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={form.priority}
+                    onChange={(e) => setForm((prev) => ({ ...prev, priority: e.target.value }))}
+                  >
                     <option>Low</option>
                     <option>Medium</option>
                     <option>High</option>
@@ -89,10 +161,17 @@ const PortalHelpdesk = () => {
                 </div>
                 <div className="sm:col-span-2 space-y-2">
                   <Label>Description</Label>
-                  <textarea className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Detailed description..." />
+                  <textarea
+                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    placeholder="Detailed description..."
+                    value={form.description}
+                    onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+                  />
                 </div>
                 <div className="sm:col-span-2">
-                  <Button type="button" onClick={() => setShowNew(false)}>Submit Ticket</Button>
+                  <Button type="button" onClick={handleSubmit} disabled={!form.subject}>
+                    Submit Ticket
+                  </Button>
                 </div>
               </form>
             </CardContent>
@@ -129,22 +208,37 @@ const PortalHelpdesk = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered
-                      .filter((t) => {
-                        if (tab === "open") return t.status !== "Resolved";
-                        if (tab === "resolved") return t.status === "Resolved";
-                        return true;
-                      })
-                      .map((t) => (
-                        <TableRow key={t.id} className="cursor-pointer">
-                          <TableCell className="font-mono text-xs text-muted-foreground">{t.id}</TableCell>
-                          <TableCell className="font-medium text-foreground">{t.subject}</TableCell>
-                          <TableCell className="hidden md:table-cell text-muted-foreground">{t.category}</TableCell>
-                          <TableCell className={`hidden sm:table-cell ${priorityStyle(t.priority)}`}>{t.priority}</TableCell>
-                          <TableCell><Badge className={statusColor(t.status)}>{t.status}</Badge></TableCell>
-                          <TableCell className="hidden lg:table-cell text-muted-foreground text-xs">{t.updated}</TableCell>
-                        </TableRow>
-                      ))}
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-6">
+                          Loading tickets…
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filtered
+                        .filter((t) => {
+                          if (tab === "open") return t.status !== "Resolved";
+                          if (tab === "resolved") return t.status === "Resolved";
+                          return true;
+                        })
+                        .map((t) => (
+                          <TableRow key={t.id} className="cursor-pointer">
+                            <TableCell className="font-mono text-xs text-muted-foreground">{t.id}</TableCell>
+                            <TableCell className="font-medium text-foreground">{t.subject}</TableCell>
+                            <TableCell className="hidden md:table-cell text-muted-foreground">{t.category}</TableCell>
+                            <TableCell className={`hidden sm:table-cell ${priorityStyle(t.priority ?? "Low")}`}>{t.priority}</TableCell>
+                            <TableCell><Badge className={statusColor(t.status ?? "Open")}>{t.status}</Badge></TableCell>
+                            <TableCell className="hidden lg:table-cell text-muted-foreground text-xs">{formatDate(t.updatedAt)}</TableCell>
+                          </TableRow>
+                        ))
+                    )}
+                    {!loading && filtered.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-6">
+                          No tickets yet.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

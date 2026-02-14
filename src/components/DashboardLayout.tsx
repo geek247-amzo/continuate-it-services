@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   CreditCard,
@@ -8,12 +8,15 @@ import {
   Users,
   Ticket,
   BarChart3,
+  FileText,
+  FileCheck2,
   LogOut,
   Menu,
   X,
   ChevronLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NavItem {
   label: string;
@@ -30,6 +33,8 @@ const clientNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { label: "Overview", path: "/admin", icon: LayoutDashboard },
+  { label: "Quotes", path: "/admin/quotes", icon: FileText },
+  { label: "Contracts", path: "/admin/contracts", icon: FileCheck2 },
   { label: "Users", path: "/admin/users", icon: Users },
   { label: "Tickets", path: "/admin/tickets", icon: Ticket },
   { label: "Subscriptions", path: "/admin/subscriptions", icon: CreditCard },
@@ -40,6 +45,8 @@ const DashboardLayout = ({ variant }: { variant: "client" | "admin" }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const nav = variant === "admin" ? adminNav : clientNav;
   const title = variant === "admin" ? "Admin" : "Portal";
 
@@ -47,15 +54,15 @@ const DashboardLayout = ({ variant }: { variant: "client" | "admin" }) => {
 
   const SidebarContent = () => (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+      <div className="flex items-center justify-between p-4 border-b border-white/10">
         {!collapsed && (
-          <Link to="/" className="font-display text-sm font-bold tracking-wider text-sidebar-foreground">
-            CONTINUATE <span className="text-sidebar-foreground/50 font-normal ml-1">{title}</span>
+          <Link to="/" className="font-display text-sm font-bold tracking-wider text-white">
+            CONTINUATE <span className="text-white/60 font-normal ml-1">{title}</span>
           </Link>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex text-sidebar-foreground/60 hover:text-sidebar-foreground"
+          className="hidden md:flex text-white/60 hover:text-white"
         >
           <ChevronLeft size={18} className={cn("transition-transform", collapsed && "rotate-180")} />
         </button>
@@ -70,8 +77,8 @@ const DashboardLayout = ({ variant }: { variant: "client" | "admin" }) => {
             className={cn(
               "flex items-center gap-3 px-3 py-2.5 rounded text-sm transition-colors",
               isActive(item.path)
-                ? "bg-sidebar-accent text-sidebar-foreground font-medium"
-                : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                ? "bg-white/10 text-white font-medium"
+                : "text-white/70 hover:text-white hover:bg-white/5"
             )}
           >
             <item.icon size={18} />
@@ -80,10 +87,10 @@ const DashboardLayout = ({ variant }: { variant: "client" | "admin" }) => {
         ))}
       </nav>
 
-      <div className="p-3 border-t border-sidebar-border">
+      <div className="p-3 border-t border-white/10">
         <Link
           to="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded text-sm text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
         >
           <LogOut size={18} />
           {!collapsed && <span>Back to Site</span>}
@@ -97,7 +104,7 @@ const DashboardLayout = ({ variant }: { variant: "client" | "admin" }) => {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col bg-sidebar-background border-r border-sidebar-border transition-all duration-300 shrink-0",
+          "hidden md:flex flex-col bg-[#0a0a0a] text-white border-r border-white/10 transition-all duration-300 shrink-0",
           collapsed ? "w-16" : "w-60"
         )}
       >
@@ -108,7 +115,7 @@ const DashboardLayout = ({ variant }: { variant: "client" | "admin" }) => {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-foreground/50" onClick={() => setMobileOpen(false)} />
-          <aside className="relative w-60 h-full flex flex-col bg-sidebar-background">
+          <aside className="relative w-60 h-full flex flex-col bg-[#0a0a0a] text-white">
             <SidebarContent />
           </aside>
         </div>
@@ -121,6 +128,19 @@ const DashboardLayout = ({ variant }: { variant: "client" | "admin" }) => {
             <Menu size={20} />
           </button>
           <h1 className="font-display text-lg font-semibold text-foreground">{title}</h1>
+          <div className="ml-auto flex items-center gap-3">
+            <span className="hidden md:inline text-xs text-muted-foreground">{user?.email ?? "Signed in"}</span>
+            <button
+              onClick={async () => {
+                await signOut();
+                navigate("/login");
+              }}
+              className="inline-flex items-center gap-2 text-sm text-foreground hover:text-foreground/80"
+            >
+              <LogOut size={16} />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          </div>
         </header>
         <main className="flex-1 p-6 overflow-auto">
           <Outlet />

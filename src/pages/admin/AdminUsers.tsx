@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,23 +7,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, UserPlus } from "lucide-react";
-
-const users = [
-  { id: "USR-001", name: "Alex Johnson", company: "Retail Firm (Pty) Ltd", plan: "Professional", devices: 24, status: "Active" },
-  { id: "USR-002", name: "Sarah Mbeki", company: "Mbeki Manufacturing", plan: "Enterprise", devices: 68, status: "Active" },
-  { id: "USR-003", name: "James van Wyk", company: "FinTech Solutions", plan: "Essential", devices: 12, status: "Active" },
-  { id: "USR-004", name: "Naledi Dube", company: "Dube Logistics", plan: "Professional", devices: 35, status: "Active" },
-  { id: "USR-005", name: "Michael Chen", company: "Chen Imports", plan: "Essential", devices: 8, status: "Suspended" },
-  { id: "USR-006", name: "Priya Patel", company: "Patel & Associates", plan: "Professional", devices: 19, status: "Active" },
-];
+import { fetchUsers, type Profile } from "@/lib/api";
 
 const AdminUsers = () => {
   const [search, setSearch] = useState("");
-  const filtered = users.filter(
-    (u) =>
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.company.toLowerCase().includes(search.toLowerCase())
-  );
+  const [users, setUsers] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    fetchUsers()
+      .then((data) => {
+        if (!active) return;
+        setUsers(data);
+      })
+      .catch(() => {
+        if (!active) return;
+        setUsers([]);
+      })
+      .finally(() => {
+        if (!active) return;
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const term = search.toLowerCase();
+    return users.filter((u) => {
+      const name = (u.name ?? u.email ?? "").toLowerCase();
+      const company = (u.company ?? "").toLowerCase();
+      return name.includes(term) || company.includes(term);
+    });
+  }, [search, users]);
 
   return (
     <div className="space-y-8">
@@ -55,25 +73,39 @@ const AdminUsers = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-foreground">{u.name}</p>
-                        <p className="text-xs text-muted-foreground md:hidden">{u.company}</p>
-                      </div>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-6">
+                      Loading users…
                     </TableCell>
-                    <TableCell className="hidden md:table-cell text-muted-foreground">{u.company}</TableCell>
-                    <TableCell><Badge variant="outline">{u.plan}</Badge></TableCell>
-                    <TableCell className="hidden sm:table-cell text-muted-foreground">{u.devices}</TableCell>
-                    <TableCell>
-                      <Badge className={u.status === "Active" ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}>
-                        {u.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell><Button variant="ghost" size="sm">View</Button></TableCell>
                   </TableRow>
-                ))}
+                ) : filtered.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-6">
+                      No users yet.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filtered.map((u) => (
+                    <TableRow key={u.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-foreground">{u.name ?? u.email}</p>
+                          <p className="text-xs text-muted-foreground md:hidden">{u.company ?? "—"}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-muted-foreground">{u.company ?? "—"}</TableCell>
+                      <TableCell><Badge variant="outline">{u.role ?? "Client"}</Badge></TableCell>
+                      <TableCell className="hidden sm:table-cell text-muted-foreground">—</TableCell>
+                      <TableCell>
+                        <Badge className={u.status === "Active" ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}>
+                          {u.status ?? "Active"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell><Button variant="ghost" size="sm">View</Button></TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </CardContent>

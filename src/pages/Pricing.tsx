@@ -19,21 +19,13 @@ import {
 import { fadeUp } from "@/lib/animations";
 
 function calculateEstimate(devices: number, cybersecurity: boolean, backup: boolean) {
-  // Tiered base rate per device — decreases at scale
-  let baseRate: number;
-  if (devices <= 20) {
-    baseRate = 250;
-  } else if (devices <= 50) {
-    baseRate = 220;
-  } else if (devices <= 100) {
-    baseRate = 190;
-  } else {
-    baseRate = 150;
-  }
+  const baseRate = 220;
+  const cybersecurityRate = 125;
+  const backupRate = 75;
 
   let base = devices * baseRate;
-  if (cybersecurity) base += devices * 100;
-  if (backup) base += devices * 50;
+  if (cybersecurity) base += devices * cybersecurityRate;
+  if (backup) base += devices * backupRate;
 
   // Show a range (±15%) to keep it consultative
   const low = Math.round(base * 0.85 / 100) * 100;
@@ -147,7 +139,7 @@ const Pricing = () => {
         </div>
       </section>
 
-      {/* Free Trial Banner */}
+      {/* Money-Back SLA */}
       <section className="section-padding bg-primary border-t border-primary-foreground/10">
         <div className="container text-center">
           <motion.div
@@ -158,19 +150,20 @@ const Pricing = () => {
             custom={0}
           >
             <p className="text-sm font-medium tracking-[0.3em] uppercase text-primary-foreground/50 mb-3">
-              Limited Offer
+              SLA Confidence
             </p>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-              Try Our Managed IT Support — Free for 30 Days
+              Money-Back SLA Service Guarantee
             </h2>
             <p className="text-primary-foreground/60 max-w-lg mx-auto mb-8 leading-relaxed">
-              No commitment. No credit card. Experience proactive monitoring, unlimited remote support, and 24/7 NOC coverage — completely free for your first month.
+              If we miss your agreed SLA targets, you receive service credits — no excuses, no hidden clauses. We stand
+              behind every response time and resolution commitment.
             </p>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 bg-white text-black px-10 py-4 text-sm font-semibold tracking-wide hover:bg-white/90 transition-colors"
             >
-              Start Your Free Trial <ArrowRight size={16} />
+              View SLA Guarantee <ArrowRight size={16} />
             </Link>
           </motion.div>
         </div>

@@ -49,6 +49,7 @@ const services = [
     icon: Shield,
     title: "Cybersecurity",
     desc: "Comprehensive, multi-layered security services that protect your business from evolving threats. From perimeter defence to endpoint protection — we cover every attack surface and keep you compliant with POPIA and industry standards.",
+    price: "R125 per device",
     features: [
       "Advanced threat detection & response",
       "Firewall management & configuration",
@@ -62,6 +63,7 @@ const services = [
     icon: HardDrive,
     title: "Backups & Disaster Recovery",
     desc: "Automated, encrypted backups with tested disaster recovery plans ensure your data is always recoverable — whether from hardware failure, ransomware, or natural disaster. We don't just back up; we verify and test recovery regularly.",
+    price: "R75 per device",
     features: [
       "Automated daily encrypted backups",
       "Off-site & cloud replication",
@@ -162,7 +164,7 @@ const Services = () => {
         </div>
       </section>
 
-      {/* Free Trial Banner */}
+      {/* Money-Back SLA */}
       <section className="section-padding bg-primary border-t border-primary-foreground/10">
         <div className="container text-center">
           <motion.div
@@ -173,19 +175,20 @@ const Services = () => {
             custom={0}
           >
             <p className="text-sm font-medium tracking-[0.3em] uppercase text-primary-foreground/50 mb-3">
-              Limited Offer
+              SLA Confidence
             </p>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-              Try Our Managed IT Support — Free for 30 Days
+              Money-Back SLA Service Guarantee
             </h2>
             <p className="text-primary-foreground/60 max-w-lg mx-auto mb-8 leading-relaxed">
-              No commitment. No credit card. Experience proactive monitoring, unlimited remote support, and 24/7 NOC coverage — completely free for your first month.
+              If we miss your agreed SLA targets, you receive service credits. Our response times and resolution
+              commitments are backed by a written SLA — no fine print.
             </p>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 bg-white text-black px-10 py-4 text-sm font-semibold tracking-wide hover:bg-white/90 transition-colors"
             >
-              Start Your Free Trial <ArrowRight size={16} />
+              View SLA Guarantee <ArrowRight size={16} />
             </Link>
           </motion.div>
         </div>
@@ -206,7 +209,10 @@ const Services = () => {
             >
               <div>
                 <service.icon size={36} className="text-foreground mb-5" strokeWidth={1.5} />
-                <h2 className="font-display text-3xl font-bold text-foreground mb-4">{service.title}</h2>
+                <h2 className="font-display text-3xl font-bold text-foreground mb-2">{service.title}</h2>
+                {service.price && (
+                  <p className="text-sm font-semibold text-foreground mb-3">{service.price}</p>
+                )}
                 <p className="text-muted-foreground leading-relaxed mb-6">{service.desc}</p>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
                   <Link
