@@ -32,6 +32,7 @@ export type Quote = {
   subtotal?: number;
   total?: number;
   currency?: string | null;
+  slaUrl?: string | null;
   items: QuoteItem[];
 };
 
@@ -198,8 +199,16 @@ const normalizeQuote = (row: any, items: QuoteItem[]): Quote => ({
   subtotal: Number(row.subtotal || 0),
   total: Number(row.total || 0),
   currency: row.currency ?? "ZAR",
+  slaUrl: row.sla_url ?? null,
   items,
 });
+
+const getAppBaseUrl = () => {
+  const fromEnv = import.meta.env.VITE_APP_BASE_URL as string | undefined;
+  if (fromEnv) return fromEnv.replace(/\/$/, "");
+  if (typeof window !== "undefined") return window.location.origin;
+  return "";
+};
 
 const normalizeContract = (row: any, quotePublicId?: string | null): Contract => ({
   id: row.public_id,
@@ -343,6 +352,9 @@ export const createQuote = async (payload: {
     kpiTags?: string[];
   }>;
 }) => {
+  const appBaseUrl = getAppBaseUrl();
+  const publicId = payload.publicId ?? generatePublicId("Q");
+  const slaUrl = appBaseUrl ? `${appBaseUrl}/sla/${publicId}` : null;
   const totals = (payload.items ?? []).reduce(
     (acc, item) => {
       const subtotal = acc.subtotal + Number(item.quantity || 0) * Number(item.unitPrice || 0);
@@ -354,7 +366,7 @@ export const createQuote = async (payload: {
   const { data: quote, error } = await supabase
     .from("quotes")
     .insert({
-      public_id: payload.publicId ?? generatePublicId("Q"),
+      public_id: publicId,
       name: payload.name,
       customer: payload.customer,
       contact_name: payload.contactName ?? null,
@@ -368,6 +380,7 @@ export const createQuote = async (payload: {
       terms: payload.terms ?? [],
       subtotal: totals.subtotal,
       total: totals.total,
+      sla_url: slaUrl,
     })
     .select("*")
     .single();

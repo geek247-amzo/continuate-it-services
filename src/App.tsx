@@ -34,6 +34,7 @@ import AdminContractDetail from "./pages/admin/AdminContractDetail";
 import AdminTests from "./pages/admin/AdminTests";
 import QuoteLiveView from "./pages/QuoteLiveView";
 import QuoteAccept from "./pages/QuoteAccept";
+import SlaView from "./pages/SlaView";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
 
           <Route path="/quote/:id" element={<QuoteLiveView />} />
           <Route path="/quote/:id/accept" element={<QuoteAccept />} />
+          <Route path="/sla/:id" element={<SlaView />} />
 
           <Route
             path="/portal"

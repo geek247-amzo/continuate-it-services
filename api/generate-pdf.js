@@ -37,7 +37,15 @@ const normalizeList = (value) => {
   return [];
 };
 
-const buildPdf = ({ quote, items }) =>
+const getBaseUrl = (req) => {
+  const envBase = process.env.APP_BASE_URL;
+  if (envBase) return envBase.replace(/\/$/, "");
+  const host = req.headers.host;
+  if (!host) return "";
+  return `https://${host}`;
+};
+
+const buildPdf = ({ quote, items, acceptUrl, slaUrl }) =>
   new Promise((resolve) => {
     const doc = new PDFDocument({ size: "A4", margin: 40 });
     const chunks = [];
@@ -50,6 +58,9 @@ const buildPdf = ({ quote, items }) =>
 
     doc.fontSize(10).fillColor("#111");
     doc.font("Helvetica-Bold").fontSize(16).text("CONTINUATE", { characterSpacing: 1 });
+    doc.font("Helvetica").fontSize(12).text("377 Rivonia Boulevard, Sandton, 2196");
+    doc.text("info@continuate.co.za • 073 209 9100");
+    doc.moveDown(0.4);
     doc.font("Helvetica").fontSize(14).text("Service Proposal");
     doc.moveDown(0.4);
     doc.font("Helvetica").fontSize(9).fillColor("#444");
@@ -119,7 +130,44 @@ const buildPdf = ({ quote, items }) =>
       doc.text("No terms listed.");
     }
 
-    doc.moveDown(1.4);
+    doc.moveDown(1.1);
+    doc.font("Helvetica-Bold").fontSize(11).text("Coverage & Eligibility");
+    doc.font("Helvetica").fontSize(9).text(
+      "All devices are covered as long as Continuate can connect to the device or environment remotely."
+    );
+
+    doc.moveDown(0.8);
+    doc.font("Helvetica-Bold").fontSize(11).text("Pricing Notes");
+    doc.font("Helvetica").fontSize(9);
+    [
+      "All prices are exclusive of VAT.",
+      "No surprise charges: all inclusions and billable extras are defined upfront.",
+      "Included service categories: Infrastructure Management, Remote Monitoring & Management, Maintenance, End-user Support.",
+      "Additional services are quoted and approved before work begins.",
+    ].forEach((line) => doc.text(`• ${line}`, { indent: 10 }));
+
+    doc.moveDown(0.8);
+    doc.font("Helvetica-Bold").fontSize(11).text("Response Times");
+    doc.font("Helvetica").fontSize(9).text(
+      "Response time is based on both impact and severity. High-impact incidents are prioritized, while low-impact items are scheduled into normal maintenance windows."
+    );
+
+    doc.moveDown(0.8);
+    doc.font("Helvetica-Bold").fontSize(11).text("Next Steps");
+    doc.font("Helvetica").fontSize(9);
+    if (acceptUrl) {
+      doc.fillColor("#111").text("Accept this quote online: ", { continued: true });
+      doc.fillColor("#0a58ca").text(acceptUrl, { link: acceptUrl, underline: true });
+    } else {
+      doc.text("Accept this quote online at the link provided by your account manager.");
+    }
+    if (slaUrl) {
+      doc.moveDown(0.4);
+      doc.fillColor("#111").text("View SLA online: ", { continued: true });
+      doc.fillColor("#0a58ca").text(slaUrl, { link: slaUrl, underline: true });
+    }
+
+    doc.moveDown(1.1);
     doc.font("Helvetica").fontSize(8).fillColor("#666");
     doc.text(`Continuate IT Services • ${new Date().toLocaleDateString("en-ZA")}`);
 
@@ -179,7 +227,10 @@ export default async function handler(req, res) {
       throw itemsError;
     }
 
-    const pdf = await buildPdf({ quote, items });
+    const appBaseUrl = getBaseUrl(req);
+    const acceptUrl = appBaseUrl ? `${appBaseUrl}/quote/${quote.public_id}/accept` : "";
+    const slaUrl = quote.sla_url ?? (appBaseUrl ? `${appBaseUrl}/sla/${quote.public_id}` : "");
+    const pdf = await buildPdf({ quote, items, acceptUrl, slaUrl });
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(

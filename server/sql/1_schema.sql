@@ -18,7 +18,8 @@ create table if not exists quotes (
   assumptions jsonb not null default '[]',
   terms jsonb not null default '[]',
   subtotal numeric(12,2) not null default 0,
-  total numeric(12,2) not null default 0
+  total numeric(12,2) not null default 0,
+  sla_url text
 );
 
 create index if not exists quotes_status_idx on quotes(status);
