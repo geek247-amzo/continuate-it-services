@@ -141,6 +141,36 @@ const process = [
   },
 ];
 
+const msspDeliverables = [
+  "24/7 security monitoring (SOC) with real-time alerting",
+  "Managed EDR/XDR with threat containment",
+  "Firewall and network security management",
+  "SIEM monitoring and log analysis",
+  "Incident response coordination",
+  "Vulnerability scanning and remediation guidance",
+  "Patch management oversight",
+  "Monthly security reporting and reviews",
+];
+
+const msspKpis = [
+  "Detection & response SLAs aligned to severity and impact",
+  "Mean time to acknowledge (MTTA)",
+  "Mean time to resolve (MTTR)",
+  "Patch compliance rate",
+  "Endpoint protection coverage",
+  "Backup and recovery success rate",
+  "Security incident trend reporting",
+];
+
+const msspSlaHighlights = [
+  "Critical: < 1 hour response, 4–8 hours resolution target",
+  "High: < 4 hours response, 24 hours resolution target",
+  "Medium: < 8 hours response, 2–3 business days resolution target",
+  "Low: 1 business day response, scheduled resolution",
+  "All devices covered where remote connectivity is possible",
+  "Pricing is exclusive of VAT; changes require written approval",
+];
+
 const Services = () => {
   return (
     <>
@@ -161,6 +191,99 @@ const Services = () => {
               From monitoring to hardware — we cover every layer of your IT stack with managed services built for reliability, security, and scale.
             </p>
           </motion.div>
+        </div>
+      </section>
+
+      {/* MSSP Detail */}
+      <section className="section-padding bg-background border-t border-border">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            custom={0}
+            className="max-w-3xl mb-12"
+          >
+            <p className="text-sm font-medium tracking-[0.3em] uppercase text-muted-foreground mb-3">
+              Managed Security Services (MSSP)
+            </p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+              Know Exactly What You’re Getting
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Our MSSP offering is built for full transparency. You get round‑the‑clock protection, clear KPIs,
+              and SLA-backed response times. We cover every device we can reach and document what’s included,
+              what’s optional, and how escalation works.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={1}
+              className="bg-secondary p-8 border border-border"
+            >
+              <h3 className="font-display text-xl font-bold text-foreground mb-4">Key Deliverables</h3>
+              <ul className="space-y-3">
+                {msspDeliverables.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-foreground">
+                    <div className="w-1.5 h-1.5 bg-foreground rounded-full mt-2 shrink-0" />
+                    <span className="text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={2}
+              className="bg-secondary p-8 border border-border"
+            >
+              <h3 className="font-display text-xl font-bold text-foreground mb-4">KPIs You Can Hold Us To</h3>
+              <ul className="space-y-3">
+                {msspKpis.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-foreground">
+                    <div className="w-1.5 h-1.5 bg-foreground rounded-full mt-2 shrink-0" />
+                    <span className="text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={3}
+              className="bg-secondary p-8 border border-border"
+            >
+              <h3 className="font-display text-xl font-bold text-foreground mb-4">SLA Highlights</h3>
+              <ul className="space-y-3">
+                {msspSlaHighlights.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-foreground">
+                    <div className="w-1.5 h-1.5 bg-foreground rounded-full mt-2 shrink-0" />
+                    <span className="text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6">
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center text-sm font-medium text-foreground hover:opacity-70 transition-opacity"
+                >
+                  Request the full SLA pack <ChevronRight size={16} className="ml-1" />
+                </Link>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
