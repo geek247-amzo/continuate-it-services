@@ -44,8 +44,11 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
       doc.moveDown(0.3);
     };
 
+    let drawingHeader = false;
     const drawHeaderFooter = (pageIndex) => {
       if (pageIndex === 0) return;
+      if (drawingHeader) return;
+      drawingHeader = true;
       const topY = 28;
       if (logoLight) {
         try {
@@ -58,7 +61,10 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
         .font("Helvetica")
         .fontSize(8)
         .fillColor("#666")
-        .text("Continuate IT Services", doc.page.margins.left + 100, topY + 6);
+        .text("Continuate IT Services", doc.page.margins.left + 100, topY + 6, {
+          width: 200,
+          lineBreak: false,
+        });
       doc
         .strokeColor("#e5e5e5")
         .lineWidth(1)
@@ -89,6 +95,7 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
           align: "right",
         });
       doc.y = 80;
+      drawingHeader = false;
     };
 
     let pageIndex = 0;
