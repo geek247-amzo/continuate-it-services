@@ -709,23 +709,26 @@ export const downloadQuotePdf = async (id: string) => {
   if (!token) {
     throw new Error("You must be signed in to download PDFs.");
   }
-  const { data, error } = await supabase.functions.invoke("quote-pdf", {
-    body: { quoteId: id },
-    headers: { Authorization: `Bearer ${token}` },
+  const response = await fetch("/api/generate-pdf", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ quoteId: id }),
   });
-  if (error) handleError(error);
-  const base64 = data?.base64 as string | undefined;
-  if (!base64) throw new Error("No PDF payload returned.");
-  const byteChars = atob(base64);
-  const byteNumbers = new Array(byteChars.length);
-  for (let i = 0; i < byteChars.length; i += 1) {
-    byteNumbers[i] = byteChars.charCodeAt(i);
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "PDF generation failed.");
   }
-  const blob = new Blob([new Uint8Array(byteNumbers)], { type: "application/pdf" });
+  const blob = await response.blob();
+  if (!blob || blob.size === 0) {
+    throw new Error("No PDF payload returned.");
+  }
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = data?.filename ?? `Continuate-Quote-${id}.pdf`;
+  link.download = `Continuate-Quote-${id}.pdf`;
   document.body.appendChild(link);
   link.click();
   link.remove();

@@ -243,8 +243,8 @@ const AdminTests = () => {
 
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <div className="text-sm font-medium">quote-pdf</div>
-              <div className="text-xs text-muted-foreground">Generates the PDF base64 for a quote.</div>
+              <div className="text-sm font-medium">PDF Export API</div>
+              <div className="text-xs text-muted-foreground">Generates a PDF via the Vercel serverless endpoint.</div>
             </div>
             <div className="flex items-center gap-3">
               {statusBadge(results.quotePdf?.status ?? "idle")}
@@ -254,14 +254,21 @@ const AdminTests = () => {
                   run("quotePdf", async () => {
                     if (!quoteId.trim()) throw new Error("Enter a quote public ID first.");
                     const token = await getAccessToken();
-                    const { data, error } = await supabase.functions.invoke("quote-pdf", {
-                      body: { quoteId: quoteId.trim() },
-                      headers: { Authorization: `Bearer ${token}` },
+                    const response = await fetch("/api/generate-pdf", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ quoteId: quoteId.trim() }),
                     });
-                    if (error) throw error;
-                    const size = data?.base64?.length ?? 0;
-                    if (!size) throw new Error("No PDF data returned.");
-                    return `PDF generated (${size} base64 chars).`;
+                    if (!response.ok) {
+                      const text = await response.text();
+                      throw new Error(text || "PDF generation failed.");
+                    }
+                    const blob = await response.blob();
+                    if (!blob || blob.size === 0) throw new Error("No PDF data returned.");
+                    return `PDF generated (${Math.round(blob.size / 1024)} KB).`;
                   })
                 }
               >
