@@ -33,15 +33,15 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
     const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
 
     const sectionTitle = (text) => {
-      doc.moveDown(0.8);
+      doc.moveDown(0.9);
       const y = doc.y;
-      doc.rect(doc.page.margins.left, y + 2, 6, 12).fill("#111");
+      doc.rect(doc.page.margins.left, y + 2, 4, 12).fill("#111");
       doc
         .font("Helvetica-Bold")
         .fontSize(11)
         .fillColor("#111")
-        .text(text.toUpperCase(), doc.page.margins.left + 12, y);
-      doc.moveDown(0.3);
+        .text(text.toUpperCase(), doc.page.margins.left + 10, y);
+      doc.moveDown(0.35);
     };
 
     let drawingHeader = false;
@@ -52,19 +52,11 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
       const topY = 28;
       if (logoLight) {
         try {
-          doc.image(logoLight, doc.page.margins.left, topY, { width: 90 });
+          doc.image(logoLight, doc.page.margins.left, topY, { width: 70 });
         } catch {
           // ignore logo render errors
         }
       }
-      doc
-        .font("Helvetica")
-        .fontSize(8)
-        .fillColor("#666")
-        .text("Continuate IT Services", doc.page.margins.left + 100, topY + 6, {
-          width: 200,
-          lineBreak: false,
-        });
       doc
         .strokeColor("#e5e5e5")
         .lineWidth(1)
@@ -79,13 +71,6 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
         .moveTo(doc.page.margins.left, footerY - 10)
         .lineTo(doc.page.width - doc.page.margins.right, footerY - 10)
         .stroke();
-      if (logoLight) {
-        try {
-          doc.image(logoLight, doc.page.margins.left, footerY - 6, { width: 60 });
-        } catch {
-          // ignore
-        }
-      }
       doc
         .font("Helvetica")
         .fontSize(8)
@@ -104,55 +89,55 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
       drawHeaderFooter(pageIndex);
     });
 
-    // Cover
-    doc.rect(0, 0, doc.page.width, 220).fill("#111");
-    doc.fillColor("#fff");
-    doc.font("Helvetica-Bold").fontSize(28).text("Business Proposal", 40, 70);
-    doc.font("Helvetica").fontSize(20).text("Managed Security Services", 40, 105);
-    doc.moveTo(40, 150).lineTo(260, 150).lineWidth(2).strokeColor("#fff").stroke();
-    doc.font("Helvetica").fontSize(11).fillColor("#fff");
-    doc.text(`Prepared for: ${quote.customer ?? "—"}`, 40, 170);
-    doc.text(`Proposal Ref: ${quote.public_id}`, 40, 188);
-
+    // Cover (premium, minimal)
+    doc.rect(0, 0, doc.page.width, doc.page.height).fill("#111");
     if (logoDark) {
       try {
-        doc.image(logoDark, 40, 235, { width: 120 });
+        doc.image(logoDark, 40, 40, { width: 130 });
       } catch {
         // ignore
       }
     }
-    doc.fillColor("#111");
-    doc.font("Helvetica-Bold").fontSize(14).text("CONTINUATE IT SERVICES", 40, 260);
-    doc.font("Helvetica").fontSize(10).text("377 Rivonia Boulevard, Sandton, 2196");
-    doc.text("info@continuate.co.za • 073 209 9100");
-    doc.text(`Date: ${new Date().toLocaleDateString("en-ZA")}`);
+    doc.fillColor("#fff");
+    doc.font("Helvetica").fontSize(12).text("Managed Security Services Proposal", 40, 140);
+    doc.font("Helvetica-Bold").fontSize(28).text(quote.customer ?? "Client", 40, 165);
+    doc.moveTo(40, 210).lineTo(260, 210).lineWidth(2).strokeColor("#fff").stroke();
+    doc.font("Helvetica").fontSize(11).text("Prepared by: Continuate IT Services", 40, 235);
+    doc.text(`Proposal Reference: ${quote.public_id}`, 40, 255);
+    doc.text(`Date: ${new Date().toLocaleDateString("en-ZA")}`, 40, 275);
+    doc.text("Confidential & Proprietary", 40, 310);
 
     doc.addPage();
     doc.fontSize(10).fillColor("#111");
 
-    doc.font("Helvetica-Bold").fontSize(16).text("Managed Security Services Proposal");
-    doc.moveDown(0.3);
-    doc.font("Helvetica").fontSize(9).fillColor("#444");
-    doc.text(`Client Name: ${quote.customer ?? "—"}`);
-    doc.text(`Prepared By: Continuate IT Services`);
-    doc.text(`Proposal Reference #: ${quote.public_id}`);
-    doc.text(`Contact: ${quote.contact_name ?? "—"} (${quote.contact_email ?? "—"})`);
-    doc.text(`Owner: ${quote.owner ?? "—"}`);
-    doc.text(`Expires: ${quote.expires_at ?? "—"}`);
-
-    sectionTitle("Executive Summary");
+    sectionTitle("Executive Overview");
     doc.font("Helvetica").fontSize(9).fillColor("#333");
     doc.text(
-      `Continuate IT Services proposes delivering comprehensive Managed Security Services to protect ${
-        quote.customer ?? "the client"
-      } against evolving cyber threats. This proposal outlines the scope, service levels, pricing, and implementation approach tailored to your operational and compliance requirements.`,
+      "In today’s evolving threat landscape, financial institutions are primary targets for increasingly sophisticated cyber attacks.",
       { width: pageWidth }
     );
     doc.moveDown(0.5);
     doc.text(
-      "Our objective is to enhance your cybersecurity posture while ensuring business continuity and regulatory alignment.",
+      "Continuate IT Services proposes a fully managed, 24/7 security operations framework designed to reduce cyber risk exposure, ensure regulatory alignment, protect business continuity, and deliver measurable security maturity improvement.",
       { width: pageWidth }
     );
+    doc.moveDown(0.4);
+    doc.text(
+      `Our Managed Security Services provide enterprise-grade protection tailored specifically to the operational requirements of ${
+        quote.customer ?? "your organization"
+      }.`,
+      { width: pageWidth }
+    );
+
+    sectionTitle("Why Continuate IT Services");
+    [
+      "24/7 Security Operations Monitoring",
+      "Financial Sector Threat Awareness",
+      "Proactive Threat Hunting",
+      "Compliance-Driven Security Framework",
+      "Dedicated Account Management",
+      "Transparent, Predictable Pricing",
+    ].forEach((line) => doc.text(`• ${line}`, { width: pageWidth }));
 
     sectionTitle("Client Overview");
     doc.text(`Client Organization: ${quote.customer ?? "—"}`, { width: pageWidth });
@@ -165,21 +150,19 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
     );
 
     sectionTitle("Scope of Services");
-    doc.font("Helvetica-Bold").text("Core MSSP Services", { width: pageWidth });
+    doc.font("Helvetica-Bold").text("Core Security Operations", { width: pageWidth });
     doc.font("Helvetica").fontSize(9);
     [
-      "24/7 Security Monitoring (SOC)",
-      "Managed Endpoint Detection & Response (EDR/XDR)",
-      "Firewall & Network Security Management",
-      "SIEM Monitoring & Log Analysis",
-      "Threat Intelligence & Threat Hunting",
-      "Incident Response Management",
-      "Vulnerability Scanning & Reporting",
-      "Patch Management Oversight",
+      "Security Monitoring (24/7 SOC): Continuous real-time monitoring of your environment.",
+      "Managed EDR / XDR: Advanced endpoint threat detection and automated containment.",
+      "SIEM & Log Management: Centralized event correlation and anomaly detection.",
+      "Firewall & Network Security Management: Policy control, rule audits, and traffic monitoring.",
+      "Incident Response Management: Coordinated containment, remediation, and reporting.",
+      "Vulnerability & Patch Oversight: Risk-based remediation planning.",
     ].forEach((item) => doc.text(`• ${item}`, { width: pageWidth }));
 
     doc.moveDown(0.4);
-    doc.font("Helvetica-Bold").text("Optional Add-On Services", { width: pageWidth });
+    doc.font("Helvetica-Bold").text("Optional Enhancements", { width: pageWidth });
     doc.font("Helvetica").fontSize(9);
     [
       "Managed Email Security",
@@ -192,20 +175,33 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
     ].forEach((item) => doc.text(`• ${item}`, { width: pageWidth }));
 
     sectionTitle("Service Levels");
-    doc.font("Helvetica-Bold").text("Response Times", { width: pageWidth });
-    doc.font("Helvetica").fontSize(9);
-    [
-      "Critical: < 1 Hour response, 4–8 Hours resolution target",
-      "High: < 4 Hours response, 24 Hours resolution target",
-      "Medium: < 8 Hours response, 2–3 Business Days resolution target",
-      "Low: 1 Business Day response, As Scheduled resolution target",
-    ].forEach((line) => doc.text(`• ${line}`, { width: pageWidth }));
-    doc.moveDown(0.4);
-    doc.font("Helvetica-Bold").text("Monitoring Coverage", { width: pageWidth });
-    doc.font("Helvetica").fontSize(9);
-    ["24/7/365 SOC Monitoring", "Automated Threat Detection", "Real-Time Alerting"].forEach((line) =>
-      doc.text(`• ${line}`, { width: pageWidth })
+    doc.font("Helvetica").fontSize(9).fillColor("#333");
+    doc.text(
+      "Our Service Level commitments are aligned to business risk impact and operational continuity requirements.",
+      { width: pageWidth }
     );
+    doc.moveDown(0.4);
+    const svcTableTop = doc.y;
+    const svcColX = [40, 210, 360, 480];
+    doc.font("Helvetica-Bold").fontSize(9).fillColor("#555");
+    doc.text("Priority", svcColX[0], svcTableTop);
+    doc.text("Response Time", svcColX[1], svcTableTop);
+    doc.text("Resolution Target", svcColX[2], svcTableTop);
+    doc.moveDown(0.6);
+    doc.strokeColor("#eee").moveTo(40, doc.y).lineTo(555, doc.y).stroke();
+    doc.moveDown(0.4);
+    doc.font("Helvetica").fontSize(9).fillColor("#111");
+    [
+      ["Critical", "< 1 Hour", "4–8 Hours"],
+      ["High", "< 4 Hours", "24 Hours"],
+      ["Medium", "< 8 Hours", "2–3 Business Days"],
+      ["Low", "1 Business Day", "Scheduled"],
+    ].forEach((row) => {
+      doc.text(row[0], svcColX[0], doc.y);
+      doc.text(row[1], svcColX[1], doc.y);
+      doc.text(row[2], svcColX[2], doc.y);
+      doc.moveDown(0.6);
+    });
 
     sectionTitle("Implementation Plan");
     doc.font("Helvetica-Bold").text("Phase 1 – Assessment & Discovery", { width: pageWidth });
@@ -238,14 +234,16 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
     ].forEach((line) => doc.text(`• ${line}`, { width: pageWidth }));
 
     sectionTitle("Pricing Structure");
-    doc.font("Helvetica-Bold").text("Managed Security Services Pricing", { width: pageWidth });
+    doc.font("Helvetica-Bold").text("Investment Summary", { width: pageWidth });
+    doc.font("Helvetica").fontSize(9).fillColor("#333");
+    doc.text("Monthly Managed Security Investment", { width: pageWidth });
     doc.moveDown(0.2);
     const tableTop = doc.y;
     const colX = [40, 250, 350, 430, 510];
     doc.fontSize(9).fillColor("#555");
     doc.text("Service Component", colX[0], tableTop);
-    doc.text("Quantity", colX[1], tableTop, { width: 80, align: "right" });
-    doc.text("Unit Price", colX[2], tableTop, { width: 80, align: "right" });
+    doc.text("Users", colX[1], tableTop, { width: 80, align: "right" });
+    doc.text("Unit", colX[2], tableTop, { width: 80, align: "right" });
     doc.text("Monthly Total", colX[3], tableTop, { width: 110, align: "right" });
     doc.moveDown(0.6);
     doc.strokeColor("#eee").moveTo(40, doc.y).lineTo(555, doc.y).stroke();
@@ -271,12 +269,18 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
     doc.moveDown(0.3);
     doc.strokeColor("#eee").moveTo(40, doc.y).lineTo(555, doc.y).stroke();
     doc.moveDown(0.5);
-    doc.font("Helvetica").fontSize(10);
-    doc.text("Total Monthly Recurring Cost", 320, doc.y, { width: 180, align: "right" });
-    doc.text(formatCurrency(quote.total ?? 0, currency), 510, doc.y, { width: 80, align: "right" });
+    doc.font("Helvetica-Bold").fontSize(14).fillColor("#111");
+    doc.text("Total Monthly Investment", 40, doc.y, { continued: true });
+    doc.text(` ${formatCurrency(quote.total ?? 0, currency)} (Excl. VAT)`);
     doc.moveDown(0.4);
     doc.font("Helvetica").fontSize(9).fillColor("#555");
-    doc.text("One-Time Setup Fee: Included", 320, doc.y, { width: 270, align: "right" });
+    doc.text("One-Time Setup Fee: Included", { width: pageWidth });
+    doc.text("Implementation Timeline: 2–6 Weeks", { width: pageWidth });
+    doc.moveDown(0.4);
+    doc.text(
+      "This investment provides enterprise-grade 24/7 protection, proactive risk management, and compliance-aligned security operations.",
+      { width: pageWidth }
+    );
 
     doc.moveDown(0.6);
     doc.x = doc.page.margins.left;
@@ -302,7 +306,7 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
       ].forEach((line) => doc.text(`• ${line}`, { width: pageWidth }));
     }
 
-    sectionTitle("Security & Compliance Commitment");
+    sectionTitle("Governance & Compliance Alignment");
     [
       "NIST Cybersecurity Framework",
       "ISO 27001 Controls",
@@ -324,16 +328,24 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
       "Additional services are quoted and approved before work begins.",
     ].forEach((line) => doc.text(`• ${line}`, { width: pageWidth }));
 
-    sectionTitle("Acceptance");
-    doc.text("Client Representative: ____________________________", { width: pageWidth });
-    doc.text("Name: ____________________________", { width: pageWidth });
-    doc.text("Title: ____________________________", { width: pageWidth });
-    doc.text("Signature: ________________________  Date: ____________", { width: pageWidth });
+    sectionTitle("Agreement & Acceptance");
+    doc.font("Helvetica").fontSize(9);
+    const accTop = doc.y;
+    const accColX = [40, 300];
+    doc.text("For Client", accColX[0], accTop);
+    doc.text("For Continuate IT Services", accColX[1], accTop);
     doc.moveDown(0.6);
-    doc.text("Continuate IT Services Representative: ____________________", { width: pageWidth });
-    doc.text("Name: ____________________________", { width: pageWidth });
-    doc.text("Title: ____________________________", { width: pageWidth });
-    doc.text("Signature: ________________________  Date: ____________", { width: pageWidth });
+    doc.text("Name: ____________________________", accColX[0], doc.y);
+    doc.text("Name: ____________________________", accColX[1], doc.y);
+    doc.moveDown(0.6);
+    doc.text("Title: ____________________________", accColX[0], doc.y);
+    doc.text("Title: ____________________________", accColX[1], doc.y);
+    doc.moveDown(0.6);
+    doc.text("Signature: ________________________", accColX[0], doc.y);
+    doc.text("Signature: ________________________", accColX[1], doc.y);
+    doc.moveDown(0.6);
+    doc.text("Date: ____________", accColX[0], doc.y);
+    doc.text("Date: ____________", accColX[1], doc.y);
 
     sectionTitle("Next Steps");
     doc.font("Helvetica").fontSize(9);
