@@ -106,6 +106,14 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
         doc.text(`• ${line}`, { width: pageWidth });
       });
     };
+    const firstDefinedString = (...values) => {
+      for (const value of values) {
+        if (value === null || value === undefined) continue;
+        const text = String(value).trim();
+        if (text) return text;
+      }
+      return "";
+    };
 
     const drawPricingHeader = (tableY, colX, colW, rowH) => {
       doc.rect(40, tableY, 515, rowH).fill("#f3f4f6");
@@ -171,18 +179,30 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
     ]);
 
     sectionTitle("Client Overview");
-    doc.text(`Client Organization: ${quote.customer ?? "—"}`, { width: pageWidth });
-    doc.text(`Primary Contact: ${quote.contact_name ?? "—"}`, { width: pageWidth });
-    doc.text("Industry: —", { width: pageWidth });
-    doc.moveDown(0.2);
-    doc.text("Current Environment Summary:", { width: pageWidth });
-    drawSimpleList([
-      "Number of Users:",
-      "Number of Endpoints:",
-      "Servers (On-Prem / Cloud):",
-      "Cloud Platforms:",
-      "Compliance Requirements:",
-    ]);
+    const overviewLines = [
+      ["Client Organization", firstDefinedString(quote.customer)],
+      ["Primary Contact", firstDefinedString(quote.contact_name, quote.contactName)],
+      ["Industry", firstDefinedString(quote.industry)],
+    ].filter(([, value]) => value);
+    overviewLines.forEach(([label, value]) => {
+      doc.text(`${label}: ${value}`, { width: pageWidth });
+    });
+
+    const envSummaryLines = [
+      ["Number of Users", firstDefinedString(quote.number_of_users, quote.numberOfUsers)],
+      ["Number of Endpoints", firstDefinedString(quote.number_of_endpoints, quote.numberOfEndpoints)],
+      ["Servers (On-Prem / Cloud)", firstDefinedString(quote.servers, quote.servers_on_prem_cloud, quote.serversOnPremCloud)],
+      ["Cloud Platforms", firstDefinedString(quote.cloud_platforms, quote.cloudPlatforms)],
+      ["Compliance Requirements", firstDefinedString(quote.compliance_requirements, quote.complianceRequirements)],
+    ].filter(([, value]) => value);
+    if (envSummaryLines.length) {
+      doc.moveDown(0.2);
+      doc.text("Current Environment Summary:", { width: pageWidth });
+      envSummaryLines.forEach(([label, value]) => {
+        ensureSpace(16);
+        doc.text(`• ${label}: ${value}`, { width: pageWidth });
+      });
+    }
 
     sectionTitle("Scope of Services");
     doc.font("Helvetica-Bold").fontSize(subheadingFontSize).fillColor("#111").text("Core Security Operations", { width: pageWidth });
@@ -403,17 +423,8 @@ export const buildPdf = ({ quote, items, acceptUrl, slaUrl, logoDark, logoLight 
     doc.text("Date: ____________", accColX[1], doc.y);
 
     sectionTitle("Next Steps");
-    if (acceptUrl) {
-      doc.fillColor("#111").text("Accept this quote online: ", { continued: true });
-      doc.fillColor("#0a58ca").text(acceptUrl, { link: acceptUrl, underline: true });
-    } else {
-      doc.text("Accept this quote online at the link provided by your account manager.");
-    }
-    if (slaUrl) {
-      doc.moveDown(0.4);
-      doc.fillColor("#111").text("View SLA online: ", { continued: true });
-      doc.fillColor("#0a58ca").text(slaUrl, { link: slaUrl, underline: true });
-    }
+    doc.fillColor("#111");
+    doc.text("To proceed with this proposal, please contact your Continuate account manager.");
 
     doc.moveDown(1.1);
     doc.font("Helvetica").fontSize(8).fillColor("#666");
